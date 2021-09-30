@@ -2,3 +2,6 @@
 # Generated Folders
 */obj
 */bin
+
+# Hidden Config-Files
+.vs
