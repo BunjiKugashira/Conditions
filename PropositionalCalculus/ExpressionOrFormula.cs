@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    abstract class ExpressionOrFormula<T>
+    public abstract class ExpressionOrFormula<T>
     {
         public IEnumerable<UnaryOperatorEnum> UnaryOperators { get; }
 
@@ -23,5 +23,15 @@
         }
 
         public abstract ExpressionOrFormula<T> WithOperators(BinaryOperatorEnum binaryOperator, IEnumerable<UnaryOperatorEnum> unaryOperators);
+
+        public ExpressionOrFormula<TNew> Filter<TNew>()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ExpressionOrFormula<T> Filter(Func<bool, T> predicate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
