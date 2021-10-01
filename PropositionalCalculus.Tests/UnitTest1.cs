@@ -8,7 +8,7 @@ namespace Conditions.Tests
         [Fact]
         public void Test1()
         {
-            new Condition().testest();
+            new Condition();
         }
     }
 }
