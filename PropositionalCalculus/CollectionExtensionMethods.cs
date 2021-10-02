@@ -8,7 +8,22 @@
 
     public static class CollectionExtensionMethods
     {
-        public static IDictionary<ICollection<T>, ExpressionOrFormula<T>> ToDictionary<T>(this ExpressionOrFormula<T> condition)
+        public static IDictionary<T, ExpressionOrFormula<T>> SolveForEachElement<T>(this ExpressionOrFormula<T> expressionOrFormula, params T[] elements)
+        {
+            if (!elements?.Any() ?? true)
+            {
+                elements = expressionOrFormula.GetAllElements().ToArray();
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static ExpressionOrFormula<T> SolveForElement<T>(this ExpressionOrFormula<T> expressionOrFormula, T element)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static ICollection<T> GetAllElements<T>(this ExpressionOrFormula<T> expressionOrFormula)
         {
             throw new NotImplementedException();
         }

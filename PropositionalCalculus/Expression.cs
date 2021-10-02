@@ -4,55 +4,65 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    class Expression<T>
+    using PropositionalCalculus.UnaryOperators;
+
+    public class Expression<T>
         : ExpressionOrFormula<T>
     {
         public T Value { get; }
 
-        public Expression(BinaryOperatorEnum? binaryOperator, IEnumerable<UnaryOperatorEnum> unaryOperators, T expression)
-            : base(binaryOperator, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperatorEnum>())
+        public Expression(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, T expression)
+            : base(binaryOperator, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
         {
             this.Value = expression;
         }
 
-        public Expression(IEnumerable<UnaryOperatorEnum> unaryOperators, T expression)
-            : base(null, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperatorEnum>())
+        public Expression(IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, T expression)
+            : base(null, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
         {
             this.Value = expression;
         }
 
-        public Expression(BinaryOperatorEnum? binaryOperator, T expression)
-            : base(binaryOperator, Array.Empty<UnaryOperatorEnum>())
+        public Expression(BinaryOperators.BinaryOperator binaryOperator, T expression)
+            : base(binaryOperator, Array.Empty<UnaryOperators.UnaryOperator>())
         {
             this.Value = expression;
         }
 
         public Expression(T expression)
-            : base(null, Array.Empty<UnaryOperatorEnum>())
+            : base(null, Array.Empty<UnaryOperators.UnaryOperator>())
         {
             this.Value = expression;
         }
 
-        private Expression(BinaryOperatorEnum? binaryOperator, IEnumerable<UnaryOperatorEnum> unaryOperators, Expression<T> template)
-            : base(binaryOperator, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperatorEnum>())
+        private Expression(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, Expression<T> template)
+            : base(binaryOperator, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
         {
             this.Value = template.Value;
         }
 
-        public override ExpressionOrFormula<T> WithOperators(BinaryOperatorEnum binaryOperator, IEnumerable<UnaryOperatorEnum> unaryOperators)
+        public override Expression<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators)
         {
             return new Expression<T>(binaryOperator, unaryOperators, this);
         }
 
-        public static Expression<T> AddOperator(UnaryOperatorEnum o, Expression<T> a)
+        public override string ToString()
         {
-            var operators = a.UnaryOperators.ToList();
-
-            operators.Insert(0, o);
-
-            return new Expression<T>(a.BinaryOperator, operators, a);
+            return base.ToString() + this.Value.ToString();
         }
 
-        public static Expression<T> operator !(Expression<T> a) => AddOperator(UnaryOperatorEnum.NOT, a);
+        public override bool Equals(object obj)
+        {
+            return obj is Expression<T> expression
+                && base.Equals(expression)
+                && this.Value.Equals(expression.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(base.GetHashCode(), this.Value.GetHashCode());
+        }
+
+        public static Expression<T> operator !(Expression<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Append(UnaryOperator.NOT));
     }
 }

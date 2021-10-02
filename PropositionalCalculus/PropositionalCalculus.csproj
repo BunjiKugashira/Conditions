@@ -11,6 +11,9 @@
     <OldToolsVersion>15.0</OldToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="BinaryOperators\Nor.cs~RF1f6c78c.TMP" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
   </ItemGroup>
