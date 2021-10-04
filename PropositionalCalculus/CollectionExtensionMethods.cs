@@ -15,7 +15,7 @@
                 elements = expressionOrFormula.GetAllElements().ToArray();
             }
 
-            throw new NotImplementedException();
+            return elements.ToDictionary(element => element, element => SolveForElement(expressionOrFormula, element));
         }
 
         public static ExpressionOrFormula<T> SolveForElement<T>(this ExpressionOrFormula<T> expressionOrFormula, T element)
@@ -23,9 +23,20 @@
             throw new NotImplementedException();
         }
 
-        public static ICollection<T> GetAllElements<T>(this ExpressionOrFormula<T> expressionOrFormula)
+        public static ISet<T> GetAllElements<T>(this ExpressionOrFormula<T> expressionOrFormula)
         {
-            throw new NotImplementedException();
+            if (expressionOrFormula is Expression<T> expression)
+            {
+                return new HashSet<T>() { expression.Value };
+            }
+            else if (expressionOrFormula is Formula<T> formula)
+            {
+                return formula.ExpressionOrFormulas.SelectMany(GetAllElements).ToHashSet();
+            }
+            else
+            {
+                throw new NotImplementedException("Method was not implemented for the given type.");
+            }
         }
     }
 }
