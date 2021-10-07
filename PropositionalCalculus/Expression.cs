@@ -11,31 +11,31 @@
     {
         public T Value { get; }
 
-        public Expression(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, T expression)
-            : base(binaryOperator, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
+        public Expression(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators, T expression)
+            : base(binaryOperator, unaryOperators)
         {
             this.Value = expression;
         }
 
-        public Expression(IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, T expression)
-            : base(null, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
+        public Expression(IEnumerable<UnaryOperator> unaryOperators, T expression)
+            : base(null, unaryOperators)
         {
             this.Value = expression;
         }
 
         public Expression(BinaryOperators.BinaryOperator binaryOperator, T expression)
-            : base(binaryOperator, Array.Empty<UnaryOperators.UnaryOperator>())
+            : base(binaryOperator, null)
         {
             this.Value = expression;
         }
 
         public Expression(T expression)
-            : base(null, Array.Empty<UnaryOperators.UnaryOperator>())
+            : base(null, null)
         {
             this.Value = expression;
         }
 
-        public override Expression<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators)
+        public override Expression<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators)
         {
             return new Expression<T>(binaryOperator, unaryOperators, this.Value);
         }

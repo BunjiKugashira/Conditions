@@ -8,17 +8,23 @@
 
     public abstract class ExpressionOrFormula<T>
     {
-        public IEnumerable<UnaryOperators.UnaryOperator> UnaryOperators { get; }
+        public IEnumerable<UnaryOperator> UnaryOperators { get; }
 
         public BinaryOperators.BinaryOperator BinaryOperator { get; }
 
-        public ExpressionOrFormula(BinaryOperators.BinaryOperator binaryOperator, params UnaryOperators.UnaryOperator[] unaryOperators)
+        public ExpressionOrFormula(BinaryOperators.BinaryOperator binaryOperator, params UnaryOperator[] unaryOperators)
         {
             this.BinaryOperator = binaryOperator;
-            this.UnaryOperators = unaryOperators?.ToList().AsReadOnly() ?? Enumerable.Empty<UnaryOperators.UnaryOperator>();
+            this.UnaryOperators = unaryOperators?.ToList().AsReadOnly() ?? Enumerable.Empty<UnaryOperator>();
         }
 
-        public abstract ExpressionOrFormula<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators);
+        public ExpressionOrFormula(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators)
+        {
+            this.BinaryOperator = binaryOperator;
+            this.UnaryOperators = unaryOperators?.ToList().AsReadOnly() ?? Enumerable.Empty<UnaryOperator>();
+        }
+
+        public abstract ExpressionOrFormula<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators);
 
         public override string ToString()
         {
@@ -36,22 +42,12 @@
         {
             var hashCode = this.BinaryOperator?.GetHashCode() ?? 0;
 
-            foreach(var unaryOperator in this.UnaryOperators)
+            foreach (var unaryOperator in this.UnaryOperators)
             {
                 hashCode = HashCode.Combine(hashCode, unaryOperator.GetHashCode());
             }
 
             return hashCode;
-        }
-
-        public ExpressionOrFormula<TNew> Filter<TNew>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ExpressionOrFormula<T> Filter(Func<bool, T> predicate)
-        {
-            throw new NotImplementedException();
         }
 
         public static Formula<T> CombineWithOperator(ExpressionOrFormula<T> a, BinaryOperators.BinaryOperator o, ExpressionOrFormula<T> b)
@@ -67,10 +63,24 @@
             return new Formula<T>(a.BinaryOperator, aContent.Concat(bContent).ToArray());
         }
 
-        public static Formula<T> operator &(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b) => CombineWithOperator(a, BinaryOperators.BinaryOperator.AND, b);
-        public static Formula<T> operator |(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b) => CombineWithOperator(a, BinaryOperators.BinaryOperator.OR, b);
-        public static Formula<T> operator ^(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b) => CombineWithOperator(a, BinaryOperators.BinaryOperator.XOR, b);
+        public static Formula<T> operator &(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
+        {
+            return CombineWithOperator(a, BinaryOperators.BinaryOperator.AND, b);
+        }
 
-        public static ExpressionOrFormula<T> operator !(ExpressionOrFormula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
+        public static Formula<T> operator |(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
+        {
+            return CombineWithOperator(a, BinaryOperators.BinaryOperator.OR, b);
+        }
+
+        public static Formula<T> operator ^(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
+        {
+            return CombineWithOperator(a, BinaryOperators.BinaryOperator.XOR, b);
+        }
+
+        public static ExpressionOrFormula<T> operator !(ExpressionOrFormula<T> a)
+        {
+            return a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
+        }
     }
 }

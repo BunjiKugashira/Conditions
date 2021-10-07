@@ -10,29 +10,29 @@
     {
         public IEnumerable<ExpressionOrFormula<T>> ExpressionOrFormulas { get; }
 
-        public Formula(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, params ExpressionOrFormula<T>[] expressionOrFormulas) 
-            : base(binaryOperator, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
+        public Formula(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators, params ExpressionOrFormula<T>[] expressionOrFormulas) 
+            : base(binaryOperator, unaryOperators)
         {
             ValidateExpressionOrFormulas(expressionOrFormulas);
             this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
         }
 
-        public Formula(IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, params ExpressionOrFormula<T>[] expressionOrFormulas)
-            : base(null, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
+        public Formula(IEnumerable<UnaryOperator> unaryOperators, params ExpressionOrFormula<T>[] expressionOrFormulas)
+            : base(null, unaryOperators)
         {
             ValidateExpressionOrFormulas(expressionOrFormulas);
             this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
         }
 
         public Formula(BinaryOperators.BinaryOperator binaryOperator, params ExpressionOrFormula<T>[] expressionOrFormulas)
-            : base(binaryOperator, Array.Empty<UnaryOperators.UnaryOperator>())
+            : base(binaryOperator, null)
         {
             ValidateExpressionOrFormulas(expressionOrFormulas);
             this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
         }
 
         public Formula(params ExpressionOrFormula<T>[] expressionOrFormulas)
-            : base(null, Array.Empty<UnaryOperators.UnaryOperator>())
+            : base(null, null)
         {
             ValidateExpressionOrFormulas(expressionOrFormulas);
             this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
@@ -57,7 +57,7 @@
             }
         }
 
-        public override Formula<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators)
+        public override Formula<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators)
         {
             return new Formula<T>(binaryOperator, unaryOperators, this.ExpressionOrFormulas.ToArray());
         }
