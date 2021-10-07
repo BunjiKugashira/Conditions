@@ -22,7 +22,7 @@
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
-            throw new System.NotImplementedException();
+            return !(a & !b | !a & b);
         }
 
         public override bool Resolve(bool a, bool b)

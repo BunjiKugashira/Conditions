@@ -26,7 +26,7 @@
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
-            return new Formula<T>(a.BinaryOperator, new List<UnaryOperator>() { UnaryOperator.NOT }, a.WithOperators(null, a.UnaryOperators), b.WithOperators(AND, b.UnaryOperators));
+            return !(a & b);
         }
 
         public override bool Resolve(bool a, bool b)

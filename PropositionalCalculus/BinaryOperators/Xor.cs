@@ -1,5 +1,9 @@
 ﻿namespace PropositionalCalculus.BinaryOperators
 {
+    using System.Linq;
+
+    using PropositionalCalculus.UnaryOperators;
+
     public class Xor : BinaryOperator
     {
         public override int CompareTo(BinaryOperator other)
@@ -22,10 +26,7 @@
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
-            return new Formula<T>(
-                a.BinaryOperator, 
-                new Formula<T>(a.WithOperators(null, a.UnaryOperators), !b.WithOperators(AND, b.UnaryOperators)), 
-                new Formula<T>(OR, !a.WithOperators(null, a.UnaryOperators), b.WithOperators(AND, b.UnaryOperators)));
+            return a & !b | !a & b;
         }
 
         public override bool Resolve(bool a, bool b)
