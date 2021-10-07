@@ -71,6 +71,6 @@
         public static Formula<T> operator |(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b) => CombineWithOperator(a, BinaryOperators.BinaryOperator.OR, b);
         public static Formula<T> operator ^(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b) => CombineWithOperator(a, BinaryOperators.BinaryOperator.XOR, b);
 
-        public static ExpressionOrFormula<T> operator !(ExpressionOrFormula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Append(UnaryOperator.NOT));
+        public static ExpressionOrFormula<T> operator !(ExpressionOrFormula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
     }
 }

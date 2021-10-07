@@ -57,6 +57,6 @@
             return HashCode.Combine(base.GetHashCode(), this.Value.GetHashCode());
         }
 
-        public static Expression<T> operator !(Expression<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Append(UnaryOperator.NOT));
+        public static Expression<T> operator !(Expression<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
     }
 }

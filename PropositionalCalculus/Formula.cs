@@ -96,6 +96,6 @@
             return hashCode;
         }
 
-        public static Formula<T> operator !(Formula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Append(UnaryOperator.NOT));
+        public static Formula<T> operator !(Formula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
     }
 }
