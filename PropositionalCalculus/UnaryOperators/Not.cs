@@ -3,8 +3,21 @@
     using System;
     using System.Linq;
 
+    using PropositionalCalculus.BinaryOperators;
+
     public class Not : UnaryOperator
     {
+        public override int CompareTo(UnaryOperator other)
+        {
+            switch (other)
+            {
+                case Not:
+                    return 0;
+                default:
+                    return -other.CompareTo(this);
+            }
+        }
+
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a)
         {
             var nots = a.UnaryOperators.Where(uo => uo is Not);
@@ -27,7 +40,20 @@
                     return new Formula<T>(
                         formula.BinaryOperator, 
                         uos, 
-                        formula.ExpressionOrFormulas.Select(eof => eof.WithOperators(eof.BinaryOperator.CounterOperator, eof.UnaryOperators)).ToArray());
+                        formula.ExpressionOrFormulas.Select(eof => 
+                        {
+                            switch (eof.BinaryOperator)
+                            {
+                                case null:
+                                    return eof.WithOperators(null, eof.UnaryOperators);
+                                case And:
+                                    return eof.WithOperators(BinaryOperator.OR, eof.UnaryOperators);
+                                case Or:
+                                    return eof.WithOperators(BinaryOperator.AND, eof.UnaryOperators);
+                                default:
+                                    throw new NotImplementedException($@"Unary operator ""Not"" is not implemented for binary operator ""{eof.BinaryOperator?.GetType()}""");
+                            }
+                        }).ToArray());
                 }
             }
 

@@ -56,11 +56,11 @@
 
         public static Formula<T> CombineWithOperator(ExpressionOrFormula<T> a, BinaryOperators.BinaryOperator o, ExpressionOrFormula<T> b)
         {
-            var aContent = (a is Formula<T> fa && !fa.HasBrackets)
+            var aContent = (a is Formula<T> fa && (fa.ExpressionOrFormulas.LastOrDefault()?.BinaryOperator?.CompareTo(o) ?? 1) < 1)
                 ? fa.ExpressionOrFormulas.Select((eof, i) => eof.WithOperators(i == 0 ? null : eof.BinaryOperator, eof.UnaryOperators.Concat(fa.UnaryOperators)))
                 : new List<ExpressionOrFormula<T>>() { a.WithOperators(null, a.UnaryOperators) };
 
-            var bContent = (b is Formula<T> fb && !fb.HasBrackets)
+            var bContent = (b is Formula<T> fb && (fb.ExpressionOrFormulas.ElementAtOrDefault(1)?.BinaryOperator?.CompareTo(o) ?? 0) < 1)
                 ? fb.ExpressionOrFormulas.Select((eof, i) => eof.WithOperators(i == 0 ? o : eof.BinaryOperator, eof.UnaryOperators.Concat(fb.UnaryOperators)))
                 : new List<ExpressionOrFormula<T>>() { b.WithOperators(o, b.UnaryOperators) };
 

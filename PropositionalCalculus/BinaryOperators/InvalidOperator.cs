@@ -9,7 +9,10 @@
             throw new InvalidOperationException("No suitable operator found.");
         }
 
-        public override BinaryOperator CounterOperator => throw new InvalidOperationException("This exception should be impossible to reach.");
+        public override int CompareTo(BinaryOperator other)
+        {
+            throw new InvalidOperationException("This exception should be impossible to reach.");
+        }
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {

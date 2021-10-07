@@ -35,15 +35,9 @@
             this.Value = expression;
         }
 
-        private Expression(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators, Expression<T> template)
-            : base(binaryOperator, unaryOperators?.ToArray() ?? Array.Empty<UnaryOperators.UnaryOperator>())
-        {
-            this.Value = template.Value;
-        }
-
         public override Expression<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperators.UnaryOperator> unaryOperators)
         {
-            return new Expression<T>(binaryOperator, unaryOperators, this);
+            return new Expression<T>(binaryOperator, unaryOperators, this.Value);
         }
 
         public override string ToString()

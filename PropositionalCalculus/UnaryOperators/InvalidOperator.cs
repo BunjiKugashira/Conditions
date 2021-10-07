@@ -9,6 +9,11 @@
             throw new InvalidOperationException("No suitable operator found.");
         }
 
+        public override int CompareTo(UnaryOperator other)
+        {
+            throw new InvalidOperationException("This exception should be impossible to reach.");
+        }
+
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a)
         {
             throw new InvalidOperationException("This exception should be impossible to reach.");
