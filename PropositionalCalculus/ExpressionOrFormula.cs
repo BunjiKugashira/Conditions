@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using PropositionalCalculus.BinaryOperators;
     using PropositionalCalculus.UnaryOperators;
 
     public abstract class ExpressionOrFormula<T>
@@ -69,22 +70,22 @@
 
         public static Formula<T> operator &(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
-            return CombineWithOperator(a, BinaryOperators.BinaryOperator.AND, b);
+            return CombineWithOperator(a, And.Instance, b);
         }
 
         public static Formula<T> operator |(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
-            return CombineWithOperator(a, BinaryOperators.BinaryOperator.OR, b);
+            return CombineWithOperator(a, Or.Instance, b);
         }
 
         public static Formula<T> operator ^(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
-            return CombineWithOperator(a, BinaryOperators.BinaryOperator.XOR, b);
+            return CombineWithOperator(a, Xor.Instance, b);
         }
 
         public static ExpressionOrFormula<T> operator !(ExpressionOrFormula<T> a)
         {
-            return a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
+            return a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(Not.Instance));
         }
     }
 }

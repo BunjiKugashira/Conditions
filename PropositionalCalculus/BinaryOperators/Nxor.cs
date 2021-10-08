@@ -1,23 +1,25 @@
 ﻿namespace PropositionalCalculus.BinaryOperators
 {
-    public class Nxor : BinaryOperator
+    using System;
+
+    public sealed class Nxor : BinaryOperator
     {
+        private static readonly Lazy<Nxor> lazy = new(() => new Nxor());
+        public static Nxor Instance { get => lazy.Value; }
+
+        private Nxor()
+        {
+        }
+
         public override int CompareTo(BinaryOperator other)
         {
-            switch (other)
+            return other switch
             {
-                case And:
-                case Nand:
-                    return 1;
-                case Or:
-                case Nor:
-                    return -1;
-                case Xor:
-                case Nxor:
-                    return 0;
-                default:
-                    return -other.CompareTo(this);
-            }
+                And or Nand => 1,
+                Or or Nor => -1,
+                Xor or Nxor => 0,
+                _ => -other.CompareTo(this),
+            };
         }
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)

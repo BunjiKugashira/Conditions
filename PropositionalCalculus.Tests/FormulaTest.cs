@@ -20,6 +20,49 @@
             var b = new Formula<string>();
             Assert.Equal(a, a);
             Assert.Equal(a, b);
+
+            a = new Formula<string>(Not.Instance);
+            Assert.NotEqual(a, b);
+
+            b = new Formula<string>(Not.Instance);
+            Assert.Equal(a, b);
+
+            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            b = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            Assert.Equal(a, a);
+            Assert.Equal(a, b);
+
+            b = new Formula<string>(new Expression<string>("a"), new Expression<string>(Or.Instance, "b"));
+            Assert.NotEqual(a, b);
+
+            b = new Formula<string>(new Expression<string>("a"), new Expression<string>(Xor.Instance, "b"));
+            Assert.NotEqual(a, b);
+
+            b = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            Assert.NotEqual(a, b);
+
+            b = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            Assert.NotEqual(a, b);
+
+            a = new Expression<string>("a") & (new Expression<string>("b") & new Expression<string>("c"));
+            b = new Expression<string>("a") & (new Expression<string>("b") & new Expression<string>("c"));
+            Assert.Equal(a, b);
+
+            b = new Expression<string>("a") & new Expression<string>("b") & new Expression<string>("c");
+            Assert.NotEqual(a, b);
+
+            b = (new Expression<string>("a") & new Expression<string>("b")) & new Expression<string>("c");
+            Assert.NotEqual(a, b);
+
+            a = (new Expression<string>("a") | new Expression<string>("b")) & new Expression<string>("c");
+            b = (new Expression<string>("a") | new Expression<string>("b")) & new Expression<string>("c");
+            Assert.Equal(a, b);
+
+            b = new Expression<string>("a") | new Expression<string>("b") & new Expression<string>("c");
+            Assert.NotEqual(a, b);
+
+            b = new Expression<string>("a") | (new Expression<string>("b") & new Expression<string>("c"));
+            Assert.NotEqual(a, b);
         }
 
         [Fact]
@@ -54,7 +97,7 @@
         public void TestWithOperator()
         {
             var a = new Formula<string>();
-            a = a.WithOperators(BinaryOperator.AND, new List<UnaryOperator>() { UnaryOperator.NOT });
+            a = a.WithOperators(And.Instance, new List<UnaryOperator>() { Not.Instance });
 
             Assert.Equal("& !", a.ToString());
         }

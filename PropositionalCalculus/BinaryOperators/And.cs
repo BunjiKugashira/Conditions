@@ -2,24 +2,24 @@
 {
     using System;
 
-    public class And : BinaryOperator
+    public sealed class And : BinaryOperator
     {
+        private static readonly Lazy<And> lazy = new(() => new And());
+        public static And Instance { get => lazy.Value; }
+
+        private And()
+        {
+        }
+
         public override int CompareTo(BinaryOperator other)
         {
-            switch (other)
+            return other switch
             {
-                case And:
-                case Nand:
-                    return 0;
-                case Or:
-                case Nor:
-                    return -1;
-                case Xor:
-                case Nxor:
-                    return -1;
-                default:
-                    return -other.CompareTo(this);
-            }
+                And or Nand => 0,
+                Or or Nor => -1,
+                Xor or Nxor => -1,
+                _ => -other.CompareTo(this),
+            };
         }
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)

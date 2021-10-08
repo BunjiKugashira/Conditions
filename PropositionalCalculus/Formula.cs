@@ -17,8 +17,22 @@
             this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
         }
 
+        public Formula(BinaryOperators.BinaryOperator binaryOperator, UnaryOperator unaryOperator, params ExpressionOrFormula<T>[] expressionOrFormulas)
+            : base(binaryOperator, unaryOperator)
+        {
+            ValidateExpressionOrFormulas(expressionOrFormulas);
+            this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
+        }
+
         public Formula(IEnumerable<UnaryOperator> unaryOperators, params ExpressionOrFormula<T>[] expressionOrFormulas)
             : base(null, unaryOperators)
+        {
+            ValidateExpressionOrFormulas(expressionOrFormulas);
+            this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
+        }
+
+        public Formula(UnaryOperator unaryOperator, params ExpressionOrFormula<T>[] expressionOrFormulas)
+            : base(null, unaryOperator)
         {
             ValidateExpressionOrFormulas(expressionOrFormulas);
             this.ExpressionOrFormulas = expressionOrFormulas ?? Enumerable.Empty<ExpressionOrFormula<T>>();
@@ -96,6 +110,6 @@
             return hashCode;
         }
 
-        public static Formula<T> operator !(Formula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
+        public static Formula<T> operator !(Formula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(Not.Instance));
     }
 }

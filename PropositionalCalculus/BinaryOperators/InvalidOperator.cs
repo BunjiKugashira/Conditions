@@ -2,9 +2,12 @@
 {
     using System;
 
-    public class InvalidOperator : BinaryOperator
+    public sealed class InvalidOperator : BinaryOperator
     {
-        public InvalidOperator()
+        private static readonly Lazy<InvalidOperator> lazy = new(() => new InvalidOperator());
+        public static InvalidOperator Instance { get => lazy.Value; }
+
+        private InvalidOperator()
         {
             throw new InvalidOperationException("No suitable operator found.");
         }

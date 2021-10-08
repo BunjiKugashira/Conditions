@@ -1,27 +1,25 @@
 ﻿namespace PropositionalCalculus.BinaryOperators
 {
-    using System.Linq;
+    using System;
 
-    using PropositionalCalculus.UnaryOperators;
-
-    public class Xor : BinaryOperator
+    public sealed class Xor : BinaryOperator
     {
+        private static readonly Lazy<Xor> lazy = new(() => new Xor());
+        public static Xor Instance { get => lazy.Value; }
+
+        private Xor()
+        {
+        }
+
         public override int CompareTo(BinaryOperator other)
         {
-            switch (other)
+            return other switch
             {
-                case And:
-                case Nand:
-                    return 1;
-                case Or:
-                case Nor:
-                    return -1;
-                case Xor:
-                case Nxor:
-                    return 0;
-                default:
-                    return -other.CompareTo(this);
-            }
+                And or Nand => 1,
+                Or or Nor => -1,
+                Xor or Nxor => 0,
+                _ => -other.CompareTo(this),
+            };
         }
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)

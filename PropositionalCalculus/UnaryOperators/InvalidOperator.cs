@@ -4,7 +4,10 @@
 
     public class InvalidOperator : UnaryOperator
     {
-        public InvalidOperator()
+        private static readonly Lazy<InvalidOperator> lazy = new(() => new InvalidOperator());
+        public static InvalidOperator Instance { get => lazy.Value; }
+
+        private InvalidOperator()
         {
             throw new InvalidOperationException("No suitable operator found.");
         }

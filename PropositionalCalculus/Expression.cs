@@ -17,8 +17,20 @@
             this.Value = expression;
         }
 
+        public Expression(BinaryOperators.BinaryOperator binaryOperator, UnaryOperator unaryOperator, T expression)
+            : base(binaryOperator, unaryOperator)
+        {
+            this.Value = expression;
+        }
+
         public Expression(IEnumerable<UnaryOperator> unaryOperators, T expression)
             : base(null, unaryOperators)
+        {
+            this.Value = expression;
+        }
+
+        public Expression(UnaryOperator unaryOperator, T expression)
+            : base(null, unaryOperator)
         {
             this.Value = expression;
         }
@@ -57,6 +69,6 @@
             return HashCode.Combine(base.GetHashCode(), this.Value.GetHashCode());
         }
 
-        public static Expression<T> operator !(Expression<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(UnaryOperator.NOT));
+        public static Expression<T> operator !(Expression<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(Not.Instance));
     }
 }

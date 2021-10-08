@@ -5,17 +5,22 @@
 
     using PropositionalCalculus.BinaryOperators;
 
-    public class Not : UnaryOperator
+    public sealed class Not : UnaryOperator
     {
+        private static readonly Lazy<Not> lazy = new(() => new Not());
+        public static Not Instance { get => lazy.Value; }
+
+        private Not()
+        {
+        }
+
         public override int CompareTo(UnaryOperator other)
         {
-            switch (other)
+            return other switch
             {
-                case Not:
-                    return 0;
-                default:
-                    return -other.CompareTo(this);
-            }
+                Not => 0,
+                _ => -other.CompareTo(this),
+            };
         }
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a)
@@ -26,35 +31,26 @@
             if (a is Expression<T> expression)
             {
                 if (nots.Count() % 2 == 0)
-                    uos.Add(NOT);
+                    uos.Add(Not.Instance);
                 return expression.WithOperators(expression.BinaryOperator, uos);
             }
             else if (a is Formula<T> formula)
             {
-                if (nots.Count() % 2 == 0)
-                {
-                    return formula.WithOperators(formula.BinaryOperator, uos);
-                }
-                else
-                {
-                    return new Formula<T>(
-                        formula.BinaryOperator, 
-                        uos, 
-                        formula.ExpressionOrFormulas.Select(eof => 
+                return nots.Count() % 2 == 0
+                    ? formula.WithOperators(formula.BinaryOperator, uos)
+                    : new Formula<T>(
+                        formula.BinaryOperator,
+                        uos,
+                        formula.ExpressionOrFormulas.Select(eof =>
                         {
-                            switch (eof.BinaryOperator)
+                            return eof.BinaryOperator switch
                             {
-                                case null:
-                                    return eof.WithOperators(null, eof.UnaryOperators);
-                                case And:
-                                    return eof.WithOperators(BinaryOperator.OR, eof.UnaryOperators);
-                                case Or:
-                                    return eof.WithOperators(BinaryOperator.AND, eof.UnaryOperators);
-                                default:
-                                    throw new NotImplementedException($@"Unary operator ""Not"" is not implemented for binary operator ""{eof.BinaryOperator?.GetType()}""");
-                            }
+                                null => eof.WithOperators(null, eof.UnaryOperators),
+                                And => eof.WithOperators(Or.Instance, eof.UnaryOperators),
+                                Or => eof.WithOperators(And.Instance, eof.UnaryOperators),
+                                _ => throw new NotImplementedException($@"Unary operator ""Not"" is not implemented for binary operator ""{eof.BinaryOperator?.GetType()}"""),
+                            };
                         }).ToArray());
-                }
             }
 
             throw new NotImplementedException("This method has only been implemented for unary and binary operators.");
