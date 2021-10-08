@@ -115,6 +115,27 @@
         }
 
         [Fact]
+        public void TestSameOperatorsInParenthesis()
+        {
+            var a = new Expression<string>("a");
+            var b = new Expression<string>("b");
+            var c = new Expression<string>("c");
+
+            var result = (a & b) & c;
+            Assert.Equal("a & b & c", result.ToString());
+            result = a & (b & c);
+            Assert.Equal("a & (b & c)", result.ToString());
+            result = (a | b) | c;
+            Assert.Equal("a | b | c", result.ToString());
+            result = a | (b | c);
+            Assert.Equal("a | (b | c)", result.ToString());
+            result = (a ^ b) ^ c;
+            Assert.Equal("a ^ b ^ c", result.ToString());
+            result = a ^ (b ^ c);
+            Assert.Equal("a ^ (b ^ c)", result.ToString());
+        }
+
+        [Fact]
         public void TestTwoExpressionsInParenthesis()
         {
             var a = new Expression<string>("a");
@@ -196,6 +217,20 @@
             Assert.Equal("a & (b ^ c | d)", result.ToString());
             result = a ^ (b & c | d);
             Assert.Equal("a ^ (b & c | d)", result.ToString());
+        }
+
+
+
+        [Fact]
+        public void TestKeepExistingParenthesis()
+        {
+            var a = new Formula<string>(new Expression<string>("a"));
+            var b = new Formula<string>(new Expression<string>("b"));
+            var c = new Formula<string>(new Expression<string>("c"));
+            var d = new Formula<string>(new Expression<string>("d"));
+
+            var result = (a & b) | c ^ d;
+            Assert.Equal("(a) & (b) | (c) ^ (d)", result.ToString());
         }
     }
 }
