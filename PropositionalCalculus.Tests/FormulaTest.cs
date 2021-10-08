@@ -38,12 +38,6 @@
             b = new Formula<string>(new Expression<string>("a"), new Expression<string>(Xor.Instance, "b"));
             Assert.NotEqual(a, b);
 
-            b = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.NotEqual(a, b);
-
-            b = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.NotEqual(a, b);
-
             a = new Expression<string>("a") & (new Expression<string>("b") & new Expression<string>("c"));
             b = new Expression<string>("a") & (new Expression<string>("b") & new Expression<string>("c"));
             Assert.Equal(a, b);

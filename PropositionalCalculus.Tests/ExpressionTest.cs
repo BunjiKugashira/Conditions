@@ -58,7 +58,7 @@ namespace Conditions.Tests
         public void TestWithOperator()
         {
             var a = new Expression<string>("a");
-            a = a.WithOperators(BinaryOperator.AND, new List<UnaryOperator>() { UnaryOperator.NOT });
+            a = a.WithOperators(And.Instance, new List<UnaryOperator>() { Not.Instance });
 
             Assert.Equal("& !a", a.ToString());
         }
