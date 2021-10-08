@@ -68,6 +68,10 @@
             return new Formula<T>(a.BinaryOperator, aContent.Concat(bContent).ToArray());
         }
 
+        public abstract ExpressionOrFormula<TNew> Where<TNew>() where TNew : T;
+
+        public abstract ExpressionOrFormula<T> Where(Func<T, bool> predicate);
+
         public static Formula<T> operator &(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
             return CombineWithOperator(a, And.Instance, b);

@@ -69,6 +69,16 @@
             return HashCode.Combine(base.GetHashCode(), this.Value.GetHashCode());
         }
 
+        public override Expression<TNew> Where<TNew>()
+        {
+            return this.Value is TNew tnew ? new Expression<TNew>(this.BinaryOperator, this.UnaryOperators, tnew) : null;
+        }
+
+        public override Expression<T> Where(Func<T, bool> predicate)
+        {
+            return predicate(this.Value) ? this : null;
+        }
+
         public static Expression<T> operator !(Expression<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(Not.Instance));
     }
 }

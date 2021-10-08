@@ -62,5 +62,29 @@ namespace Conditions.Tests
 
             Assert.Equal("& !a", a.ToString());
         }
+
+        [Fact]
+        public void TestWherePredicate()
+        {
+            var a = new Expression<string>("a");
+
+            var result = a.Where(value => value == "a");
+            Assert.NotNull(result);
+
+            result = a.Where(value => value == "b");
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void TestWhereType()
+        {
+            var a = new Expression<object>("a");
+
+            var resultString = a.Where<string>();
+            Assert.NotNull(resultString);
+
+            var resultInt = a.Where<int>();
+            Assert.Null(resultInt);
+        }
     }
 }

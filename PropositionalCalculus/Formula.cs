@@ -110,6 +110,20 @@
             return hashCode;
         }
 
+        public override Formula<TNew> Where<TNew>()
+        {
+            var subs = this.ExpressionOrFormulas.Select(eof => eof.Where<TNew>()).Where(eof => eof != null);
+
+            return new Formula<TNew>(this.BinaryOperator, this.UnaryOperators, subs.ToArray());
+        }
+
+        public override Formula<T> Where(Func<T, bool> predicate)
+        {
+            var subs = this.ExpressionOrFormulas.Select(eof => eof.Where(predicate)).Where(eof => eof != null);
+
+            return new Formula<T>(this.BinaryOperator, this.UnaryOperators, subs.ToArray());
+        }
+
         public static Formula<T> operator !(Formula<T> a) => a.WithOperators(a.BinaryOperator, a.UnaryOperators.Prepend(Not.Instance));
     }
 }

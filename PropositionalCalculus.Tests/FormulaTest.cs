@@ -269,5 +269,29 @@
             var result = (a & b) | c ^ d;
             Assert.Equal("(a) & (b) | (c) ^ (d)", result.ToString());
         }
+
+        [Fact]
+        public void TestWherePredicate()
+        {
+            var a = new Expression<object>("a") & new Expression<object>(1);
+
+            var result = a.Where(value => value is string s && s == "a");
+            Assert.Equal(new Formula<object>(new Expression<object>("a")), result);
+
+            result = a.Where(value => value is string s && s == "b");
+            Assert.Equal(new Formula<object>(), result);
+        }
+
+        [Fact]
+        public void TestWhereType()
+        {
+            var a = new Expression<object>("a");
+
+            var resultString = a.Where<string>();
+            Assert.NotNull(resultString);
+
+            var resultInt = a.Where<int>();
+            Assert.Null(resultInt);
+        }
     }
 }
