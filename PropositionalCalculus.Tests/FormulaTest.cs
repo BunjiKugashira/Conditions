@@ -115,7 +115,7 @@
         }
 
         [Fact]
-        public void TestBraces()
+        public void TestTwoExpressionsInParenthesis()
         {
             var a = new Expression<string>("a");
             var b = new Expression<string>("b");
@@ -160,6 +160,42 @@
             Assert.Equal("a & b ^ (c | d)", result.ToString());
             result = a ^ b & (c | d);
             Assert.Equal("a ^ b & (c | d)", result.ToString());
+        }
+
+        [Fact]
+        public void TestThreeExpressionsInParenthesis()
+        {
+
+            var a = new Expression<string>("a");
+            var b = new Expression<string>("b");
+            var c = new Expression<string>("c");
+            var d = new Expression<string>("d");
+
+            var result = (a & b | c) ^ d;
+            Assert.Equal("(a & b | c) ^ d", result.ToString());
+            result = (a | b & c) ^ d;
+            Assert.Equal("(a | b & c) ^ d", result.ToString());
+            result = (a | b ^ c) & d;
+            Assert.Equal("(a | b ^ c) & d", result.ToString());
+            result = (a ^ b | c) & d;
+            Assert.Equal("(a ^ b | c) & d", result.ToString());
+            result = (a & b ^ c) | d;
+            Assert.Equal("a & b ^ c | d", result.ToString());
+            result = (a ^ b & c) | d;
+            Assert.Equal("a ^ b & c | d", result.ToString());
+
+            result = a & (b | c ^ d);
+            Assert.Equal("a & (b | c ^ d)", result.ToString());
+            result = a | (b & c ^ d);
+            Assert.Equal("a | b & c ^ d", result.ToString());
+            result = a | (b ^ c & d);
+            Assert.Equal("a | b ^ c & d", result.ToString());
+            result = a ^ (b | c & d);
+            Assert.Equal("a ^ (b | c & d)", result.ToString());
+            result = a & (b ^ c | d);
+            Assert.Equal("a & (b ^ c | d)", result.ToString());
+            result = a ^ (b & c | d);
+            Assert.Equal("a ^ (b & c | d)", result.ToString());
         }
     }
 }
