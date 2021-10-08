@@ -20,28 +20,28 @@
             {
                 this._unaryOperators ??= new Dictionary<string, UnaryOperator>
                 {
-                    {UnaryOperator.NOT.ToString(), UnaryOperator.NOT},
+                    {Not.Instance.ToString(), Not.Instance},
                 };
                 return this._unaryOperators;
             }
             set => this._unaryOperators = value ?? throw new ArgumentNullException(nameof(this.UnaryOperators));
         }
 
-        private IDictionary<string, BinaryOperators.BinaryOperator> _binaryOperators;
+        private IDictionary<string, BinaryOperator> _binaryOperators;
 
         [DisallowNull]
-        public IDictionary<string, BinaryOperators.BinaryOperator> BinaryOperators
+        public IDictionary<string, BinaryOperator> BinaryOperators
         {
             get
             {
-                this._binaryOperators ??= new Dictionary<string, BinaryOperators.BinaryOperator>
+                this._binaryOperators ??= new Dictionary<string, BinaryOperator>
                 {
-                    { BinaryOperator.AND.ToString(), BinaryOperator.AND },
-                    { BinaryOperator.OR.ToString(), BinaryOperator.OR },
-                    { BinaryOperator.XOR.ToString(), BinaryOperator.XOR },
-                    { BinaryOperator.NAND.ToString(), BinaryOperator.NAND },
-                    { BinaryOperator.NOR.ToString(), BinaryOperator.NOR },
-                    { BinaryOperator.NXOR.ToString(), BinaryOperator.NXOR },
+                    { And.Instance.ToString(), And.Instance },
+                    { Or.Instance.ToString(), Or.Instance },
+                    { Xor.Instance.ToString(), Xor.Instance },
+                    { Nand.Instance.ToString(), Nand.Instance },
+                    { Nor.Instance.ToString(), Nor.Instance },
+                    { Nxor.Instance.ToString(), Nxor.Instance },
                 };
                 return this._binaryOperators;
             }
@@ -71,8 +71,8 @@
         private string ConvertToString<T>(
             ExpressionOrFormula<T> expressionOrFormula,
             Func<T, string> customToString,
-            IDictionary<BinaryOperators.BinaryOperator, string> binaryOperators,
-            IDictionary<UnaryOperators.UnaryOperator, string> unaryOperators)
+            IDictionary<BinaryOperator, string> binaryOperators,
+            IDictionary<UnaryOperator, string> unaryOperators)
         {
             if (expressionOrFormula == null)
             {
@@ -81,7 +81,7 @@
 
             customToString ??= (T obj) => obj.ToString();
 
-            var str = expressionOrFormula.BinaryOperator == null ? string.Empty : binaryOperators[expressionOrFormula.BinaryOperator ?? BinaryOperator.INVALID_OPERATOR];
+            var str = expressionOrFormula.BinaryOperator == null ? string.Empty : binaryOperators[expressionOrFormula.BinaryOperator ?? PropositionalCalculus.BinaryOperators.InvalidOperator.Instance];
             if (expressionOrFormula.BinaryOperator != null && expressionOrFormula.UnaryOperators.Any())
             {
                 str += this.BinaryToUnarySeparator;

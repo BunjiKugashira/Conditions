@@ -6,6 +6,9 @@
     using System.Text;
     using System.Threading.Tasks;
 
+    using PropositionalCalculus.BinaryOperators;
+    using PropositionalCalculus.UnaryOperators;
+
     public class TruthTable<T>
     {
         public class Row
@@ -99,13 +102,13 @@
                 {
                     var expressions = row.InputValues
                     .Select((iv, ivIndex) => new Expression<T>(
-                        ivIndex == 0 ? null : BinaryOperators.BinaryOperator.AND, 
-                        iv.Value ? Enumerable.Empty<UnaryOperators.UnaryOperator>() : new UnaryOperators.UnaryOperator[] { UnaryOperators.UnaryOperator.NOT }, 
+                        ivIndex == 0 ? null : And.Instance, 
+                        iv.Value ? Enumerable.Empty<UnaryOperator>() : new UnaryOperator[] { Not.Instance }, 
                         iv.Key))
                     .ToArray();
                     return new Formula<T>(
-                        rowIndex == 0 ? null : BinaryOperators.BinaryOperator.OR,
-                        row.OutputValue ? Enumerable.Empty<UnaryOperators.UnaryOperator>() : new UnaryOperators.UnaryOperator[] { UnaryOperators.UnaryOperator.NOT },
+                        rowIndex == 0 ? null : Or.Instance,
+                        row.OutputValue ? Enumerable.Empty<UnaryOperator>() : new UnaryOperator[] { Not.Instance },
                         expressions);
                 })
                 .ToArray();
