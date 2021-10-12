@@ -11,21 +11,21 @@
     {
         public IEnumerable<UnaryOperator> UnaryOperators { get; }
 
-        public BinaryOperators.BinaryOperator BinaryOperator { get; }
+        public BinaryOperator BinaryOperator { get; }
 
-        public ExpressionOrFormula(BinaryOperators.BinaryOperator binaryOperator, params UnaryOperator[] unaryOperators)
+        public ExpressionOrFormula(BinaryOperator binaryOperator, params UnaryOperator[] unaryOperators)
         {
             this.BinaryOperator = binaryOperator;
             this.UnaryOperators = unaryOperators?.ToList().AsReadOnly() ?? Enumerable.Empty<UnaryOperator>();
         }
 
-        public ExpressionOrFormula(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators)
+        public ExpressionOrFormula(BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators)
         {
             this.BinaryOperator = binaryOperator;
             this.UnaryOperators = unaryOperators?.ToList().AsReadOnly() ?? Enumerable.Empty<UnaryOperator>();
         }
 
-        public abstract ExpressionOrFormula<T> WithOperators(BinaryOperators.BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators);
+        public abstract ExpressionOrFormula<T> WithOperators(BinaryOperator binaryOperator, IEnumerable<UnaryOperator> unaryOperators);
 
         public override string ToString()
         {
@@ -51,7 +51,7 @@
             return hashCode;
         }
 
-        public static Formula<T> CombineWithOperator(ExpressionOrFormula<T> a, BinaryOperators.BinaryOperator o, ExpressionOrFormula<T> b)
+        public static Formula<T> CombineWithOperator(ExpressionOrFormula<T> a, BinaryOperator o, ExpressionOrFormula<T> b)
         {
             var aContent = (a is Formula<T> fa 
                 && fa.ExpressionOrFormulas.Count() > 1 
