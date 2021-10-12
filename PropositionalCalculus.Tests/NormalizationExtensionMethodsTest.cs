@@ -63,7 +63,45 @@
         [Fact]
         public void TestIsRedundant()
         {
+            var a = new Formula<string>();
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(And.Instance));
 
+            a = new Formula<string>(And.Instance);
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(And.Instance));
+
+            a = new Formula<string>(new Expression<string>("a"));
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(And.Instance));
+
+            a = new Formula<string>(And.Instance, new Expression<string>("a"));
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(And.Instance));
+
+            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(And.Instance));
+
+            a = new Formula<string>(And.Instance, new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(And.Instance));
+
+            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(Or.Instance, "b"));
+            Assert.True(a.IsRedundant(null));
+            Assert.False(a.IsRedundant(And.Instance));
+
+            a = new Formula<string>(And.Instance, new Expression<string>("a"), new Expression<string>(Or.Instance, "b"));
+            Assert.False(a.IsRedundant(null));
+            Assert.False(a.IsRedundant(And.Instance));
+
+            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(Or.Instance));
+
+            a = new Formula<string>(Or.Instance, new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
+            Assert.True(a.IsRedundant(null));
+            Assert.True(a.IsRedundant(Or.Instance));
         }
 
         [Fact]
