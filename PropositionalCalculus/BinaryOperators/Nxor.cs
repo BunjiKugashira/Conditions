@@ -24,6 +24,11 @@
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
+            if (b.BinaryOperator is not Nxor)
+            {
+                throw new ArgumentException("Operator must be of type " + nameof(Nxor));
+            }
+
             return !(a & !b | !a & b);
         }
 

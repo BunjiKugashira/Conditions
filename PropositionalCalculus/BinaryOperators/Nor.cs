@@ -24,6 +24,11 @@
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
+            if (b.BinaryOperator is not Nor)
+            {
+                throw new ArgumentException("Operator must be of type " + nameof(Nor));
+            }
+
             return !(a | b);
         }
 

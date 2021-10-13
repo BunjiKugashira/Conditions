@@ -24,6 +24,11 @@
 
         public override ExpressionOrFormula<T> Normalize<T>(ExpressionOrFormula<T> a, ExpressionOrFormula<T> b)
         {
+            if (b.BinaryOperator is not And)
+            {
+                throw new ArgumentException("Operator must be of type " + nameof(And));
+            }
+
             return new Formula<T>(a.BinaryOperator, a.WithOperators(null, a.UnaryOperators), b);
         }
 
