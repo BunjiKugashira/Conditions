@@ -1,6 +1,5 @@
-namespace Conditions.Tests
+namespace PropositionalCalculus.Tests
 {
-    using System;
     using System.Collections.Generic;
 
     using PropositionalCalculus;

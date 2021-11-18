@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
 
     using PropositionalCalculus.BinaryOperators;
+    using PropositionalCalculus.UnaryOperators;
 
     using Xunit;
 
@@ -15,143 +16,386 @@
         [Fact]
         public void TestToConjunctiveNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void TestIsConjunctiveNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void TestToDisjunctiveNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void TestIsDisjunctiveNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void TestToNegationNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void TestIsNegationNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void TestToCanonicalNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void TestIsCanonicalNormalForm()
         {
-
+            throw new NotImplementedException();
         }
 
-        [Fact]
-        public void TestIsRedundant()
+        [Theory]
+        [InlineData("a", "a")]
+        [InlineData("a & b", "a & b")]
+        [InlineData("(a)", "a")]
+        [InlineData("(a & b)", "a & b")]
+        [InlineData("(a) & b", "a & b")]
+        [InlineData("a & (b)", "a & b")]
+        [InlineData("a & (b | c)", "a & b | a & c")]
+        [InlineData("a | (b & c)", "a | b & c")]
+        [InlineData("(a & b) | c", "a & b | c")]
+        [InlineData("(a | b) & c", "a & c | b & c")]
+        [InlineData("(a | b) & (c | d)", "a & b | a & d | b & c | b & d")]
+        [InlineData("(a & b | c) ^ d", "a & b ^ d | c ^ d")]
+        public void TestFlatten_ExpectGivenOutput(string input, string expectedOutput)
         {
-            var a = new Formula<string>();
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(And.Instance));
+            // Arrange
+            var parser = new Parser();
+            var inputExpressionOrFormula = parser.ParseString(input);
 
-            a = new Formula<string>(And.Instance);
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(And.Instance));
+            // Act
+            var outputExpressionOrFormula = inputExpressionOrFormula.Flatten();
+            var result = parser.ConvertToString(outputExpressionOrFormula);
 
-            a = new Formula<string>(new Expression<string>("a"));
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(And.Instance));
-
-            a = new Formula<string>(And.Instance, new Expression<string>("a"));
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(And.Instance));
-
-            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(And.Instance));
-
-            a = new Formula<string>(And.Instance, new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(And.Instance));
-
-            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(Or.Instance, "b"));
-            Assert.True(a.IsRedundant(null));
-            Assert.False(a.IsRedundant(And.Instance));
-
-            a = new Formula<string>(And.Instance, new Expression<string>("a"), new Expression<string>(Or.Instance, "b"));
-            Assert.False(a.IsRedundant(null));
-            Assert.False(a.IsRedundant(And.Instance));
-
-            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(Or.Instance));
-
-            a = new Formula<string>(Or.Instance, new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.True(a.IsRedundant(null));
-            Assert.True(a.IsRedundant(Or.Instance));
+            // Assert
+            Assert.Equal(expectedOutput, result);
         }
 
-        [Fact]
-        public void TestRemoveRedundantParenthesis()
+        [Theory]
+        [InlineData("a")]
+        [InlineData("a & b")]
+        [InlineData("a | b")]
+        [InlineData("a & b | c")]
+        public void TestIsFlat_ExpectTrue(string input)
         {
-            var a = new Formula<string>(new Expression<string>("a"));
-            Assert.Equal(new Expression<string>("a"), a.RemoveRedundantParenthesis());
+            // Arrange
+            var parser = new Parser();
+            var expressionOrFormula = parser.ParseString(input);
 
-            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.Equal(a, a.RemoveRedundantParenthesis());
+            // Act
+            var result = expressionOrFormula.IsFlat();
 
-            a = new Formula<string>(new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b")), new Expression<string>(And.Instance, "c"));
-            Assert.Equal(new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"), new Expression<string>(And.Instance, "c")), a.RemoveRedundantParenthesis());
-
-            a = new Formula<string>(new Formula<string>(new Expression<string>("a"), new Expression<string>(Or.Instance, "b")), new Expression<string>(And.Instance, "c"));
-            Assert.Equal(a, a.RemoveRedundantParenthesis());
-
-            a = new Formula<string>(new Expression<string>("a"), new Formula<string>(And.Instance, new Expression<string>("b"), new Expression<string>(And.Instance, "c")));
-            Assert.Equal(new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"), new Expression<string>(And.Instance, "c")), a.RemoveRedundantParenthesis());
-
-            a = new Formula<string>(new Expression<string>("a"), new Formula<string>(And.Instance, new Expression<string>("b"), new Expression<string>(Or.Instance, "c")));
-            Assert.Equal(a, a.RemoveRedundantParenthesis());
+            // Assert
+            Assert.True(result);
         }
 
-        [Fact]
-        public void TestHasRedundantParenthesis()
+        [Theory]
+        [InlineData("( )")]
+        [InlineData("(a)")]
+        [InlineData("(a & b)")]
+        [InlineData("(a & b) & c")]
+        [InlineData("a & (b & c)")]
+        public void TestIsFlat_ExpectFalse(string input)
         {
-            var a = new Formula<string>(new Expression<string>("a"));
-            Assert.True(a.HasRedundantParenthesis());
+            // Arrange
+            var parser = new Parser();
+            var expressionOrFormula = parser.ParseString(input);
 
-            a = new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b"));
-            Assert.False(a.HasRedundantParenthesis());
+            // Act
+            var result = expressionOrFormula.IsFlat();
 
-            a = new Formula<string>(new Formula<string>(new Expression<string>("a"), new Expression<string>(And.Instance, "b")), new Expression<string>(And.Instance, "c"));
-            Assert.True(a.HasRedundantParenthesis());
+            // Assert
+            Assert.False(result);
+        }
 
-            a = new Formula<string>(new Formula<string>(new Expression<string>("a"), new Expression<string>(Or.Instance, "b")), new Expression<string>(And.Instance, "c"));
-            Assert.False(a.HasRedundantParenthesis());
+        [Theory]
+        [InlineData("()")]
+        [InlineData("(a)")]
+        [InlineData("(a & b)")]
+        [InlineData("(a | b)")]
+        [InlineData("a & b")]
+        [InlineData("a | b")]
+        public void TestIsRedundant_WithoutOperator_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input);
 
-            a = new Formula<string>(new Expression<string>("a"), new Formula<string>(And.Instance, new Expression<string>("b"), new Expression<string>(And.Instance, "c")));
-            Assert.True(a.HasRedundantParenthesis());
+            // Act
+            var result = formula.IsRedundant(null);
 
-            a = new Formula<string>(new Expression<string>("a"), new Formula<string>(And.Instance, new Expression<string>("b"), new Expression<string>(Or.Instance, "c")));
-            Assert.False(a.HasRedundantParenthesis());
+            // Assert
+            Assert.True(result);
+        }
 
-            a = new Formula<string>(new Expression<string>("a"), new Formula<string>(And.Instance, new Expression<string>("b"), new Expression<string>(Or.Instance, "c"), new Expression<string>(And.Instance, "d"), new Expression<string>(Or.Instance, "e")));
-            Assert.False(a.HasRedundantParenthesis());
+        [Theory]
+        [InlineData("()")]
+        [InlineData("(a & b)")]
+        [InlineData("(a | b)")]
+        [InlineData("(a ^ b)")]
+        [InlineData("a & b")]
+        public void TestIsRedundant_WithAnd_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input);
 
-            a = new Formula<string>(new Expression<string>("a"), new Formula<string>(Xor.Instance, new Expression<string>("b"), new Expression<string>(Or.Instance, "c"), new Expression<string>(And.Instance, "d"), new Expression<string>(Or.Instance, "e")));
-            Assert.False(a.HasRedundantParenthesis());
+            // Act
+            var result = formula.IsRedundant(And.Instance);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData("a | b")]
+        [InlineData("a ^ b")]
+        public void TestIsRedundant_WithAnd_ExpectFalse(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input);
+
+            // Act
+            var result = formula.IsRedundant(And.Instance);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Theory]
+        [InlineData("()")]
+        [InlineData("(a & b)")]
+        [InlineData("(a | b)")]
+        [InlineData("(a ^ b)")]
+        [InlineData("a & b")]
+        public void TestIsRedundant_WithLeadingAnd_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input).WithOperators(And.Instance, Enumerable.Empty<UnaryOperator>());
+
+            // Act
+            var result = formula.IsRedundant(null);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData("a | b")]
+        [InlineData("a ^ b")]
+        public void TestIsRedundant_WithLeadingAnd_ExpectFalse(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input).WithOperators(And.Instance, Enumerable.Empty<UnaryOperator>());
+
+            // Act
+            var result = formula.IsRedundant(null);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Theory]
+        [InlineData("()")]
+        [InlineData("(a & b)")]
+        [InlineData("(a | b)")]
+        [InlineData("(a ^ b)")]
+        [InlineData("a & b")]
+        [InlineData("a | b")]
+        [InlineData("a ^ b")]
+        public void TestIsRedundant_WithOr_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input);
+
+            // Act
+            var result = formula.IsRedundant(Or.Instance);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData("()")]
+        [InlineData("(a & b)")]
+        [InlineData("(a | b)")]
+        [InlineData("(a ^ b)")]
+        [InlineData("a & b")]
+        [InlineData("a | b")]
+        [InlineData("a ^ b")]
+        public void TestIsRedundant_WithLeadingOr_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input).WithOperators(Or.Instance, Enumerable.Empty<UnaryOperator>());
+
+            // Act
+            var result = formula.IsRedundant(null);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData("()")]
+        [InlineData("(a & b)")]
+        [InlineData("(a | b)")]
+        [InlineData("(a ^ b)")]
+        [InlineData("(a & b | c)")]
+        [InlineData("a & b")]
+        [InlineData("a ^ b")]
+        public void TestIsRedundant_WithXor_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input);
+
+            // Act
+            var result = formula.IsRedundant(Xor.Instance);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData("a | b")]
+        [InlineData("a & b | c")]
+        public void TestIsRedundant_WithXor_ExpectFalse(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input);
+
+            // Act
+            var result = formula.IsRedundant(Xor.Instance);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Theory]
+        [InlineData("()")]
+        [InlineData("(a & b)")]
+        [InlineData("(a | b)")]
+        [InlineData("(a ^ b)")]
+        [InlineData("(a & b | c)")]
+        [InlineData("a & b")]
+        [InlineData("a ^ b")]
+        public void TestIsRedundant_WithLeadingXor_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input).WithOperators(Xor.Instance, Enumerable.Empty<UnaryOperator>());
+
+            // Act
+            var result = formula.IsRedundant(null);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData("a | b")]
+        [InlineData("a & b | c")]
+        public void TestIsRedundant_WithLeadingXor_ExpectFalse(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var formula = (Formula<string>)parser.ParseString(input).WithOperators(Xor.Instance, Enumerable.Empty<UnaryOperator>());
+
+            // Act
+            var result = formula.IsRedundant(null);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Theory]
+        [InlineData("(a)", "a")]
+        [InlineData("(!a)", "!a")]
+        [InlineData("(a & b)", "a & b")]
+        [InlineData("(a & b) & c", "a & b & c")]
+        [InlineData("a & (b & c)", "a & b & c")]
+        [InlineData("a & ((b | c))", "a & (b | c)")]
+        [InlineData("(a & b) ^ (c | d)", "a & b ^ (c | d)")]
+        [InlineData("(a | b) ^ (c & d)", "(a | b) ^ c & d")]
+        public void TestRemoveRedundantParenthesis_ExpectGivenOutput(string input, string expectedOutput)
+        {
+            // Arrange
+            var parser = new Parser();
+            var inputExpressionOrFormula = parser.ParseString(input);
+
+            // Act
+            var outputExpressionOrFormula = inputExpressionOrFormula.RemoveRedundantParenthesis();
+            var output = parser.ConvertToString(outputExpressionOrFormula);
+
+            // Assert
+            Assert.Equal(expectedOutput, output);
+        }
+
+        [Theory]
+        [InlineData("( )")]
+        [InlineData("(a)")]
+        [InlineData("(!a)")]
+        [InlineData("(a & b)")]
+        [InlineData("(a & b) & c")]
+        [InlineData("a & (b & c)")]
+        [InlineData("a & ((b | c))")]
+        [InlineData("(a & b) ^ (c | d)")]
+        [InlineData("(a | b) ^ (c & d)")]
+        public void TestHasRedundantParenthesis_ExpectTrue(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var expressionOrFormula = parser.ParseString(input);
+
+            // Act
+            var result = expressionOrFormula.HasRedundantParenthesis();
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData("a & b")]
+        [InlineData("a & (b | c)")]
+        [InlineData("(a | b) & c")]
+        [InlineData("(a | b) & (c | d)")]
+        [InlineData("a ^ (b & c | d)")]
+        [InlineData("(a & b | c) ^ d")]
+        public void TestHasRedundantParenthesis_ExpectFalse(string input)
+        {
+            // Arrange
+            var parser = new Parser();
+            var expressionOrFormula = parser.ParseString(input);
+
+            // Act
+            var result = expressionOrFormula.HasRedundantParenthesis();
+
+            // Assert
+            Assert.False(result);
         }
     }
 }

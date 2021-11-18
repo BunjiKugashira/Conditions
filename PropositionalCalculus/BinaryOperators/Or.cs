@@ -1,6 +1,7 @@
 ﻿namespace PropositionalCalculus.BinaryOperators
 {
     using System;
+using System.Collections.Generic;
 
     public sealed class Or : BinaryOperator
     {
@@ -29,7 +30,25 @@
                 throw new ArgumentException("Operator must be of type " + nameof(Or));
             }
 
-            return new Formula<T>(a.BinaryOperator, a.WithOperators(null, a.UnaryOperators), b);
+            var groupA = a is Formula<T> listA
+                ? listA.ExpressionOrFormulas
+                : new List<ExpressionOrFormula<T>>() { a, };
+
+            var groupB = b is Formula<T> listB
+                ? listB.ExpressionOrFormulas
+                : new List<ExpressionOrFormula<T>>() { b, };
+
+            var ret = new Formula<T>();
+
+            foreach (var subA in groupA)
+            {
+                foreach (var subB in groupB)
+                {
+                    ret = ExpressionOrFormula<T>.CombineWithOperator(ret, subA.BinaryOperator, subA | subB);
+                }
+            }
+
+            return ret;
         }
 
         public override bool Resolve(bool a, bool b)

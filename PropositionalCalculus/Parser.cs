@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Text.Json;
@@ -63,9 +64,129 @@
         public string BracketToUnarySeparator = string.Empty;
         public string BracketToExpressionSeparator = string.Empty;
 
+        private enum ParseElement
+        {
+            Expression,
+            Bracket,
+            UnaryOperator,
+            BinaryOperator,
+            Separator,
+        }
+
         public ExpressionOrFormula<T> Parse<T>(string input, Func<string, T> parseCallback)
         {
-            throw new NotImplementedException();
+            var position = 0;
+            return this.ParseFromPosition(input, parseCallback, ref position);
+        }
+
+        private ExpressionOrFormula<T> ParseFromPosition<T>(string input, Func<string, T> parseCallback, ref int position)
+        {
+            BinaryOperator binOp = null;
+            var unOps = new List<UnaryOperator>();
+            var subStr = string.Empty;
+            var result = new List<ExpressionOrFormula<T>>();
+
+            var expectElements = new Collection<ParseElement>
+            {
+                ParseElement.Expression,
+                ParseElement.Bracket,
+                ParseElement.UnaryOperator,
+            };
+
+            while (position < input.Length)
+            {
+                subStr += input[position++];
+                var compStr = subStr.Trim();
+
+                if (expectElements.Contains(ParseElement.BinaryOperator) && this.BinaryOperators.TryGetValue(compStr, out binOp))
+                {
+                    subStr = string.Empty;
+
+                    expectElements = new Collection<ParseElement>
+                    {
+                        ParseElement.Expression,
+                        ParseElement.Bracket,
+                        ParseElement.UnaryOperator,
+                    };
+                }
+                else if (expectElements.Contains(ParseElement.UnaryOperator) && this.UnaryOperators.TryGetValue(compStr, out var unOp))
+                {
+                    unOps.Add(unOp);
+
+                    subStr = string.Empty;
+
+                    expectElements = new Collection<ParseElement>
+                    {
+                        ParseElement.Expression,
+                        ParseElement.Bracket,
+                        ParseElement.UnaryOperator,
+                    };
+                }
+                else if (expectElements.Contains(ParseElement.Bracket) && this.Brackets.Item1.ToString() == compStr)
+                {
+                    var bracketContent = this.ParseFromPosition(input, parseCallback, ref position);
+                    result.Add(bracketContent.WithOperators(binOp, unOps));
+
+                    binOp = null;
+                    unOps.Clear();
+                    subStr = string.Empty;
+
+                    expectElements = new Collection<ParseElement>
+                    {
+                        ParseElement.Bracket,
+                        ParseElement.BinaryOperator,
+                    };
+
+                    if (position >= input.Length)
+                    {
+                        return new Formula<T>(result.ToArray());
+                    }
+                }
+                else if (expectElements.Contains(ParseElement.Bracket) && this.Brackets.Item2.ToString() == compStr)
+                {
+                    if (unOps.Any())
+                    {
+                        throw new FormulaFormatException("Missing expression between unary operator and closing bracket.", position);
+                    }
+
+                    if (binOp != null)
+                    {
+                        throw new FormulaFormatException("Missing expression between binary operator and closing bracket.", position);
+                    }
+
+                    return new Formula<T>(result.ToArray());
+                }
+                else if (expectElements.Contains(ParseElement.Expression) && (
+                    position >= input.Length
+                    || input[position..].StartsWith(this.Brackets.Item2)
+                    || this.BinaryOperators.Keys.Any(input[position..].StartsWith)))
+                {
+                    compStr = this.Trim ? compStr : subStr;
+                    if (!string.IsNullOrEmpty(compStr))
+                    {
+                        var element = parseCallback(compStr);
+                        var expression = new Expression<T>(binOp, unOps, element);
+                        result.Add(expression);
+                    }
+
+                    binOp = null;
+                    unOps.Clear();
+                    subStr = string.Empty;
+
+                    expectElements = new Collection<ParseElement>
+                    {
+                        ParseElement.Bracket,
+                        ParseElement.BinaryOperator,
+                    };
+
+                    if (position >= input.Length)
+                    {
+                        return result.Count == 1 ? result.First() : new Formula<T>(result.ToArray());
+                    }
+                }
+            }
+
+            throw new FormulaFormatException($"Expected one of {string.Join(", ", expectElements)}, but reached end of string.", position);
         }
 
         private string ConvertToString<T>(
@@ -146,7 +267,13 @@
             var binaryOperators = this.BinaryOperators.ToDictionary(kv => kv.Value, kv => kv.Key);
             var unaryOperators = this.UnaryOperators.ToDictionary(kv => kv.Value, kv => kv.Key);
 
-            return this.ConvertToString(expressionOrFormula, customToString, binaryOperators, unaryOperators);
+            var result = this.ConvertToString(expressionOrFormula, customToString, binaryOperators, unaryOperators);
+            if (expressionOrFormula is Formula<T> formula && formula.BinaryOperator == null && !formula.UnaryOperators.Any())
+            {
+                result = result[1..^1];
+            }
+
+            return result;
         }
 
         public string ConvertToString<T>(ExpressionOrFormula<T> expressionOrFormula)

@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
 
     using PropositionalCalculus.BinaryOperators;
+    using PropositionalCalculus.UnaryOperators;
 
     public static class NormalizationExtensionMethods
     {
@@ -37,7 +38,13 @@
 
         public static bool IsNegationNormalForm<T>(this ExpressionOrFormula<T> expressionOrFormula)
         {
-            throw new NotImplementedException();
+            return expressionOrFormula switch
+            {
+                Expression<T> => expressionOrFormula.UnaryOperators.Count(o => o is Not) <= 1,
+                Formula<T> formula => formula.UnaryOperators.All(o => o is not Not) && formula.ExpressionOrFormulas.All(eof => eof.IsNegationNormalForm()),
+                TruthValue<T> => expressionOrFormula.UnaryOperators.All(o => o is not Not),
+                _ => throw new NotImplementedException("This method is not implemented for type " + expressionOrFormula.GetType())
+            };
         }
 
         public static ExpressionOrFormula<T> ToCanonicalNormalForm<T>(this ExpressionOrFormula<T> expressionOrFormula)
@@ -137,6 +144,64 @@
             }
 
             return false;
+        }
+
+        public static ExpressionOrFormula<T> Flatten<T>(this ExpressionOrFormula<T> expressionOrFormula)
+        {
+            if (expressionOrFormula is Formula<T> formula)
+            {
+                if (!formula.ExpressionOrFormulas.Any())
+                {
+                    return formula;
+                }
+
+                if (formula.ExpressionOrFormulas.Count() == 1)
+                {
+                    var single = formula.ExpressionOrFormulas.Single();
+                    var unaryOperators = formula.UnaryOperators.ToList();
+                    unaryOperators.AddRange(single.UnaryOperators);
+                    return single.WithOperators(formula.BinaryOperator, unaryOperators);
+                }
+
+                var eofs = formula.ExpressionOrFormulas.Select(Flatten);
+                var first = eofs.First();
+                var result = first is Formula<T> firstFormula ? firstFormula : new Formula<T>(first.BinaryOperator, first.WithOperators(null, first.UnaryOperators));
+                foreach(var eof in eofs.Skip(1))
+                {
+                    var aGroup = SplitForOperator(eof.BinaryOperator, result.ExpressionOrFormulas);
+                    var bGroup = SplitForOperator(eof.BinaryOperator, eof is Formula<T> bFormula ? bFormula.ExpressionOrFormulas : new List<ExpressionOrFormula<T>> { eof });
+                    var iteration = new List<ExpressionOrFormula<T>>();
+                    foreach(var a in aGroup)
+                    {
+                        foreach(var b in bGroup)
+                        {
+                            var aFirst = a.First();
+                            var bFirst = b.First();
+                            iteration.Add(aFirst.WithOperators(bFirst.BinaryOperator, aFirst.UnaryOperators));
+                        }
+                    }
+                }
+            }
+
+            return expressionOrFormula;
+        }
+
+        public static bool IsFlat<T>(this ExpressionOrFormula<T> expressionOrFormula)
+        {
+            return expressionOrFormula is not Formula<T> formula
+                || formula.ExpressionOrFormulas.Count() > 1 
+                && formula.ExpressionOrFormulas.All(eof => eof is not Formula<T>);
+        }
+
+        private static IEnumerable<IEnumerable<ExpressionOrFormula<T>>> SplitForOperator<T>(BinaryOperator binaryOperator, IEnumerable<ExpressionOrFormula<T>> expressionOrFormulas)
+        {
+            var remainingEofs = expressionOrFormulas;
+            while (remainingEofs.Any())
+            {
+                var group = remainingEofs.TakeWhile(_ => (_.BinaryOperator?.CompareTo(binaryOperator) ?? -1) <= 0);
+                remainingEofs = remainingEofs.Skip(group.Count());
+                yield return group;
+            }
         }
     }
 }
