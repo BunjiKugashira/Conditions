@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CollectionsExtensions\CollectionsExtensions.csproj" />
+    <ProjectReference Include="..\FlowControl\FlowControl.csproj" />
   </ItemGroup>
 
 </Project>
